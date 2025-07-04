@@ -21,11 +21,7 @@ void Poker::introduceGame() const {
 }
 
 void Poker::playGame() {
-    for (int i = 0; i < rounds; ++i)
-    // ****
-    // ループの途中でデッキのカードが無くなるとエラーで強制終了になるので、対策を考える
-    // ****
-    {
+    for (int i = 0; i < rounds; ++i) {
         std::cout << "【" << i + 1 << "ラウンド】" << std::endl;
 
         // カードの配布
@@ -45,8 +41,6 @@ void Poker::playGame() {
 
             for (size_t i = 0; i < selectedDiscards.size(); ++i) {
                 if (selectedDiscards.at(i)) {
-                    // gamePlayer.swapCards(i, deck.draw());
-
                     // 手札から捨てたカードをdiscardsに追加
                     auto gamePlayerDiscard = gamePlayer.getDiscard(i);
                     discards.push_back(std::move(gamePlayerDiscard));
@@ -71,10 +65,8 @@ void Poker::playGame() {
         HandRole dealerHandRole = dealer.getHandRole();
         HandRole gamePlayerHandRole = gamePlayer.getHandRole();
 
-        std::cout << "対戦相手の役    ->" << handRoleToString(dealerHandRole)
-                  << std::endl;
-        std::cout << "あなたの役      ->"
-                  << handRoleToString(gamePlayerHandRole) << std::endl;
+        std::cout << "対戦相手の役    ->" << handRoleToString(dealerHandRole) << std::endl;
+        std::cout << "あなたの役      ->" << handRoleToString(gamePlayerHandRole) << std::endl;
 
         // ラウンドの結果を表示
         std::cout << "\n" << "ラウンドの結果 -> ";
@@ -89,20 +81,24 @@ void Poker::playGame() {
         // 対戦相手と自分の手札を初期化(std::unique_ptr<Card>をplayer.handからdiscardsに移動)
         while (!gamePlayer.getHand().empty()) {
 
+            // discards.push_back(std::move(dealer.getDiscard()));
+            // discards.push_back(std::move(gamePlayer.getDiscard()));
+
+            //-> コンパイルエラー(下のエラーメッセージ)が出る
+            // error: use of deleted function 'std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&)
+            // [with _Tp = Card; _Dp = std::default_delete<Card>]'
+
+            // 一度変数にstd::unique_ptr<Card>の戻り値を格納してからdiscardsに追加するとコンパイルが通る
+
             auto dealerDiscard = dealer.getDiscard();
             auto gamePlayerDiscard = gamePlayer.getDiscard();
-
-            // discards.push_back(std::move(dealer.getDiscard()));
-            //-> コンパイルエラーになるのは、なぜ？
 
             discards.push_back(std::move(dealerDiscard));
             discards.push_back(std::move(gamePlayerDiscard));
         }
 
-        std::cout << "残りの山札の枚数 -> " << deck.getDeck().size()
-                  << "枚だよー" << std::endl;
-        std::cout << "捨てカードの枚数 -> " << discards.size() << "枚だよー"
-                  << std::endl;
+        std::cout << "残りの山札の枚数 -> " << deck.getDeck().size() << "枚だよー" << std::endl;
+        std::cout << "捨てカードの枚数 -> " << discards.size() << "枚だよー" << std::endl;
         std::cout << std::endl;
     }
 
@@ -163,8 +159,7 @@ std::array<bool, 5> Poker::selectDiscard() {
             isDiscardArr.at(selectIndex) = true;
         }
 
-        std::cout << "他に交換するカードはありますか？ (1=Yes; 0=No)"
-                  << std::endl;
+        std::cout << "他に交換するカードはありますか？ (1=Yes; 0=No)" << std::endl;
         int inputValue;
         std::cin >> inputValue;
         if (inputValue != 1) {
