@@ -12,15 +12,11 @@ Player::Player() : hand() {}
 
 Player::~Player() {}
 
-const std::vector<std::unique_ptr<Card>> &Player::getHand() const {
-    return hand;
-}
+const std::vector<std::unique_ptr<Card>> &Player::getHand() const { return hand; }
 
 void Player::initHand() { hand.clear(); }
 
-void Player::addToHand(std::unique_ptr<Card> cardPtr) {
-    hand.push_back(std::move(cardPtr));
-}
+void Player::addToHand(std::unique_ptr<Card> cardPtr) { hand.push_back(std::move(cardPtr)); }
 
 void Player::addToHand(std::unique_ptr<Card> cardPtr, size_t index) {
     hand.insert(hand.begin() + index, std::move(cardPtr));
@@ -45,9 +41,6 @@ const std::unique_ptr<Card> Player::getDiscard(size_t index) {
     }
 
     std::unique_ptr<Card> discard(std::move(hand.at(index)));
-    //--------------------------------------------------------------------------
-    // 上記でunique_ptrの所有権を移動させたので、hand.at(index)はnullptrになってるのか確認
-    //--------------------------------------------------------------------------
 
     // 移動元の要素は不要なので削除
     hand.erase(hand.begin() + index);
@@ -89,7 +82,6 @@ HandRole Player::getHandRole() const {
 void Player::printHand() const {
     int index = 0;
     for (const auto &card : hand) {
-        // デッキ内のカードがなくなった後、card(ポインタがnullPtr)->toString()を呼び出す際にエラーになっている
         std::cout << "[" << index << "] " << card->toString() << " |";
         ++index;
     }
